@@ -1,0 +1,65 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Форма обратной связи</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style_contact.css' %}">
+</head>
+<body>
+<div class="container">
+    <div class="form-container">
+        <h2 class="mb-4 text-center">Связаться с нами</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            {% load widget_tweaks %} {# Загружаем библиотеку твиков #}
+
+            {# 1. Общие ошибки формы (non_field_errors) #}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {# 2. Цикл по полям #}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                    </label>
+
+                    {# Логика с widget_tweaks: добавляем класс is-invalid при ошибке #}
+                    {% if field.errors %}
+                        {% render_field field class="form-control is-invalid" %}
+
+                        <div class="invalid-feedback d-block">
+                            {{ field.errors }}
+                        </div>
+                    {% else %}
+                        {% render_field field class="form-control" %}
+                    {% endif %}
+
+                    {# Подсказка (help_text) #}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Отправить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
